@@ -60,3 +60,52 @@ To avoid the above issue, most languages have keywords to restrict interactions 
 
 Writing code that uses threads is a balannce of safety and performance.
 Protected Regions of code are potential performance bottlenecks, and if protections are applied to widely, then performance suffers and the number of requests that can be processed concurrently falls. But, requests may interfere with one another and produce unexpected results if protections are applied too sparsely.
+
+Understanding Blocking and non-blocking operations
+
+in most server-side apps, the thread processing an http request spends most of its time waiting. That can be from waiting for a database to produce a result, waiting for the next chunk of data from a file, or waiting for access to a protected region of code.
+
+When a thread is waiting, it is said to be blocked. A blocked thread is unable to any other work until the operation it is waiting for, has been completed; during which time, the capacity of the server to process requests is reduced. In busy apps, there is a constant flow of new requests arriving, and having threads tied up doing nothing leads to queues of requests waiting to be processed and reduced overall throughput.
+
+One solution to the above, is to use non-blocking operations, also known as asynchronous operations.
+
+"Imagine that, after taking an order, an employee in the restaurant went into
+the kitchen, assembled your pizza, put it in the oven, stood there waiting for it
+to cook for 10 minutes, and then served it to you. This is the blocking – or
+synchronous – approach to preparing pizza."
+There is a better approach....
+
+"There is a more sensible approach. One employee – let’s name them Bob – is
+given the job of monitoring the oven. The other employees take orders,
+assemble the pizzas, and put them in the oven just as before, but rather than
+waiting for them to cook, they ask Bob to tell them when the pizza is cooked.
+While Bob watches the pizzas in the oven, the employees can carry on
+working, taking the order of the next customer in the queue, preparing the
+next pizza, and so on. Bob can watch lots of pizzas, so the limit to the number
+of pizzas that can be produced is the size of the oven and not the number of
+employees.
+Cooking a pizza has become a non-blocking operation for everyone except
+Bob. There is no way around waiting for the oven, but the performance of the
+restaurant is improved by making one person do all the waiting. Everyone is
+happy.
+Well, almost. The owner is happy because the restaurant produces more
+pizzas. The customers in the queue are happy because employees can start
+working on their pizza while Bob is watching earlier orders. But individual
+orders may take longer: Bob may tell another employee that a pizza is ready,
+but they won’t be able to serve it if they are busy with another customer. The
+overall restaurant performance improves, but individual orders may take
+longer to complete." figure 4.3 goes along.
+
+"Instead of waiting for an operation to complete, handler threads rely on a
+monitor thread while they continue to process requests from the queue. When
+the blocking operation has finished, the monitor thread puts the request back
+in the queue so that a handler thread can continue processing the request.
+The process of handing off an operation for monitoring is usually integrated
+into the API used to write web applications, so that performing a read from a
+file, for example, automatically releases the handler thread so it can do other
+work and can be trusted to put the request in the queue for processing whenthe file read operation is complete.
+It is important to understand that the terms non-blocking and asynchronous
+are from the perspective of the handler thread. The operations still take time
+to complete, but the handler thread can do other work during that period.
+There are still blocking threads, but they are not the ones responsible for
+processing HTTP requests, which are the threads we care about the most." Mastering Node.js
