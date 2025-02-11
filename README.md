@@ -22,12 +22,15 @@ Chapter Summary
 Perform Tasks Concurrently
 Use the Node.js API to handle events with callback functions and promises.
 10-15
+
 Wrap Code as Promises or Callbacks
 Use promisiffy and callbackify functions
 16,17
+
 Avoid Blocking the main thread for simple tasks
 Break up work into smaller chunks that can be interleaved with other work
 21
+
 Avoid blocking the main thread for complex tasks
 Use worker threads
 22-27
