@@ -51,3 +51,12 @@ response back to the client, and then returns to the queue for the next request.
 The server hardware can execute multiple threads simultaneously, as
 illustrated in Figure 4.2, so that a large volume of requests can be received
 and processed concurrently.
+
+The above approach makes use of the server hardware, but it requires us devs to consider how the requests might interfere with eachother. 
+
+A common problem is that one handler thread modifies data as it is being read by another thread producing an unexpected result.
+
+To avoid the above issue, most languages have keywords to restrict interactions between threads. The details vary, but keywords like lock and synchronize are used to ensure threads safely use shared resources and data by creating protected refions of code that can only be executed by one thread at a time.
+
+Writing code that uses threads is a balannce of safety and performance.
+Protected Regions of code are potential performance bottlenecks, and if protections are applied to widely, then performance suffers and the number of requests that can be processed concurrently falls. But, requests may interfere with one another and produce unexpected results if protections are applied too sparsely.
