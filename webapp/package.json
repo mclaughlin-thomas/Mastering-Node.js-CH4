@@ -8,5 +8,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
+  }
 }
