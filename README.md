@@ -34,3 +34,20 @@ Break up work into smaller chunks that can be interleaved with other work
 Avoid blocking the main thread for complex tasks
 Use worker threads
 22-27
+
+
+-----
+Understanding (simplified) server code execution
+
+Concurrency is a genuinely fascinating subject, and it can be a rewarding area of research. But beore digging into the details, bear in mind that to be an effective js dev, you only need a basic overview of concurrency - like the one in this chapter.
+
+Server-side web apps need to be able to process many http requests simultaneously to scale up economically so that a small amount of server capacity can be used to support a large number of clients.
+
+The conventional approach is to take advantage of the multi-threaded features
+of modern server hardware by creating a pool of handler threads. When a new
+HTTP request arrives, it is added to a queue where it waits until one of the
+threads is available to process it. The thread processes the request, sends the
+response back to the client, and then returns to the queue for the next request.
+The server hardware can execute multiple threads simultaneously, as
+illustrated in Figure 4.2, so that a large volume of requests can be received
+and processed concurrently.
