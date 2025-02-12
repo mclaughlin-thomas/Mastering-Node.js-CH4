@@ -155,3 +155,6 @@ Problem of blocking the main thread. We do not want that.
 the main thread in two ways: an API that performs many tasks
 asynchronously, known as the worker pool, and support for starting extra
 threads to execute blocking JavaScript code, known as worker threads." Mastering Node.js
+
+Using the Node.js API
+Node.js replaces the API provided by the browser with one that supports common server-side tasks, like processing http requests and reading files. Behind the scenes, node.js uses native threads, known as the worker pool, to perform operations asynchronously.
