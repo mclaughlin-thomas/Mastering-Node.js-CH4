@@ -109,3 +109,49 @@ are from the perspective of the handler thread. The operations still take time
 to complete, but the handler thread can do other work during that period.
 There are still blocking threads, but they are not the ones responsible for
 processing HTTP requests, which are the threads we care about the most." Mastering Node.js
+
+Understanding Javascript code execution
+JS was originally used to provide user interaction with html elements. Each type of element defines
+events that describe the different ways the user can interact with that element. A buttom element, for ex,
+has events for when the user clicks the button, moves the pointer over the button and so on.
+
+The programmer writes js functions called callbacks and uses the browsers api to associate these functions with
+specific events on elements. When the browser detects an event, it adds the callback to a queue so it can be executed by The
+JS runtime.
+
+JS runtime has only a single thread: The main thread. The main thread is responsible for executing the callbacks.
+Main thread runs in a loop, taking callbacks from the queue and executing them, which is referred to as the JS event loop.
+
+The js runtime only ever executes on callback, so the JS language doesnt need keywords like lock and synchronize.
+JS code interacts through the browser through an API that hides away the implementation details and receives results consistently.
+
+Understanding Node.js Code Execution
+Node.js retains the main thread and the event loop, which means that server side code is executed in the same way
+as client-side js. For HTTP servers, the main thread is the only request handler, and callbacks are used to handle incoming 
+HTTP connections.
+
+The example application demonstrates the use of a callback to handle an http request:
+
+const server = createServer(handler);
+
+The callback function passed to the createServer function will be invoked when Node.js receives an http connection.
+The function defines parameters that represent the request that has been received and the response that will be returned to the client:
+
+export const handler = (req: IncomingMessage, res: ServerResponse) => {
+    res.end("Hello World");
+};
+
+Ch5 talks of the callback function, but the callback fcn uses its parameters to prepare the response that will be sent to the client. 
+Node JS may only have a single handler thread, but the performance can be excellent because modern server hardware is incredibly fast.
+
+But, single thread does not take full advantage of the multi-core and multi-processor hardware to which most applications are deployed.
+
+For the above, to scale up, multiple instances of Node.js are started. HTTP requests are received by a load balancer, and distributed to the node.js instances.
+
+The individual node.js instances still have a single js thread but collectively they can process a higher volume of requests.
+
+Problem of blocking the main thread. We do not want that.
+"Node.js helps programmers avoid blocking
+the main thread in two ways: an API that performs many tasks
+asynchronously, known as the worker pool, and support for starting extra
+threads to execute blocking JavaScript code, known as worker threads." Mastering Node.js
