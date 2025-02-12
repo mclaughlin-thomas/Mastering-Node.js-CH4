@@ -158,3 +158,7 @@ threads to execute blocking JavaScript code, known as worker threads." Mastering
 
 Using the Node.js API
 Node.js replaces the API provided by the browser with one that supports common server-side tasks, like processing http requests and reading files. Behind the scenes, node.js uses native threads, known as the worker pool, to perform operations asynchronously.
+
+Handling Events
+Events are used to provide notifications that the state of the application has changed and provide an opportuninity to execute a callback function to handle that change. Events are handled through the node.js api, though these are often conveinence features that hide away the details. Server.ts
+
