@@ -1,3 +1,6 @@
+//Worker threads features are defined in the worker_threads module
+
+
 import { workerData, parentPort } from "worker_threads";
 console.log(`Worker thread ${workerData.request} started`);
 for (let iter = 0; iter < workerData.iterations; iter++) {
