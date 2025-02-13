@@ -272,3 +272,7 @@ export const handler = async (req: IncomingMessage, res: ServerResponse) => {
         await res.end();
     });
 };
+
+//the important difference from the earlier examples is that work
+// for requests is being performed in parallel rather than all of the work being
+// performed on a single thread

@@ -169,4 +169,8 @@ Executing Custom Code
 all js is executed by main thread, which means that any operation that does not use the non-blocking API from node.js WILL block the thread. 
 
 Using Worker Threads
+Node.js supports worker threads, which are additional threads for executing js, albeit with restrictions. js does not have any features for coordinating threads, instead worker threads run in separate instances of the node.js engine, executing code in isolation from the main thread. Communication between the main thread and worker threads is done using events, which fits nicely into the js event loop.
 
+Worker threads aer not the solution to every problem because there is overhead in creating and managing them; however, they do provide an effective way to execure js without blocking the main thread.
+
+The worker pool is the set of threads that node.js uses to implement the asynchronous features of its API. We do not directly interact with the worker pool.
