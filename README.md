@@ -167,3 +167,6 @@ Promises are an alternative to callbacks and some parts of the Node.js API give 
 
 Executing Custom Code
 all js is executed by main thread, which means that any operation that does not use the non-blocking API from node.js WILL block the thread. 
+
+Using Worker Threads
+
