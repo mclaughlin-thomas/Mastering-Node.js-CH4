@@ -9,15 +9,15 @@
 //     console.log(`Server listening on port ${port}`);
 // });
 
-import { createServer } from "http";
-import { handler } from "./handler";
-const port = 5000;
-const server = createServer();
-server.on("request", handler)
-server.listen(port);
-server.on("listening", () => {
-    console.log(`(Event) Server listening on port ${port}`);
-});
+// import { createServer } from "http";
+// import { handler } from "./handler";
+// const port = 5000;
+// const server = createServer();
+// server.on("request", handler)
+// server.listen(port);
+// server.on("listening", () => {
+//     console.log(`(Event) Server listening on port ${port}`);
+// });
 
 //many objects created with node.js api extend the Event Emitter class. Useful eventemitter methods
 //on(event,callback)
@@ -36,3 +36,20 @@ server.on("listening", () => {
 // "It is important to understand that events are an integral part of the Node.js
 // API and that they can be used directly, with the methods described in Table
 // 4.3, or indirectly through other features."
+
+// filtering requests in the server.ts
+import { createServer } from "http";
+import { handler } from "./handler";
+const port = 5000;
+const server = createServer();
+server.on("request", (req, res) => {
+    if (req.url?.endsWith("favicon.ico")) {
+        res.statusCode = 404;
+        res.end();} else {
+        handler(req, res)
+    }
+});
+server.listen(port);
+server.on("listening", () => {
+console.log(`(Event) Server listening on port${port}`);
+});

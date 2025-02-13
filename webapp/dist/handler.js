@@ -6,8 +6,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const promises_1 = require("fs/promises");
+const promises_2 = require("./promises"); // NEW
 const handler = async (req, res) => {
-    const data = await (0, promises_1.readFile)("data.json");
-    res.end(data, () => console.log("File sent"));
+    try {
+        const data = await (0, promises_1.readFile)("data.json");
+        await promises_2.endPromise.bind(res)(data); // NEW, have to bind method when using the await keyword on the fcn that promisify creates
+        console.log("File sent"); // NEW
+    }
+    catch (err) {
+        console.log(`Error: ${err?.message ?? err}`);
+        res.statusCode = 500;
+        res.end();
+    }
 };
 exports.handler = handler;

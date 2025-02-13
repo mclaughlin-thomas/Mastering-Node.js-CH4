@@ -120,18 +120,18 @@
 // const data: Buffer = await readFile("data.json");
 
 // adding error handling
-import { IncomingMessage, ServerResponse } from "http";
-import { readFile } from "fs/promises";
-export const handler = async (req: IncomingMessage, res: ServerResponse) => {
-    try {
-        const data: Buffer = await readFile("data.json");
-        res.end(data, () => console.log("File sent"));
-    } catch (err: any) { // any because js does not restrict the types that can be used to represent errors
-        console.log(`Error: ${err?.message ?? err}`);
-        res.statusCode = 500;
-        res.end();
-    }
-};
+// import { IncomingMessage, ServerResponse } from "http";
+// import { readFile } from "fs/promises";
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     try {
+//         const data: Buffer = await readFile("data.json");
+//         res.end(data, () => console.log("File sent"));
+//     } catch (err: any) { // any because js does not restrict the types that can be used to represent errors
+//         console.log(`Error: ${err?.message ?? err}`);
+//         res.statusCode = 500;
+//         res.end();
+//     }
+// };
 
 // "One advantage of callbacks over promises is that callbacks
 // can be invoked more than once for the same operation,
@@ -146,3 +146,19 @@ export const handler = async (req: IncomingMessage, res: ServerResponse) => {
 // this problem in the example, where the readFile function returns a
 // promise, but the end method, which sends data to the client and finishes the
 // HTTP response, uses a callback"
+
+// using a promise in the handler.ts
+import { IncomingMessage, ServerResponse } from "http";
+import { readFile } from "fs/promises";
+import { endPromise } from "./promises"; // NEW
+export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+    try {
+        const data: Buffer = await readFile("data.json");
+        await endPromise.bind(res)(data); // NEW, have to bind method when using the await keyword on the fcn that promisify creates
+        console.log("File sent"); // NEW
+    } catch (err: any) {
+        console.log(`Error: ${err?.message ?? err}`);
+        res.statusCode = 500;
+        res.end();
+    }
+};
