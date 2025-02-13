@@ -148,17 +148,87 @@
 // HTTP response, uses a callback"
 
 // using a promise in the handler.ts
+// import { IncomingMessage, ServerResponse } from "http";
+// import { readFile } from "fs/promises";
+// import { endPromise } from "./promises"; // NEW
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     try {
+//         const data: Buffer = await readFile("data.json");
+//         await endPromise.bind(res)(data); // NEW, have to bind method when using the await keyword on the fcn that promisify creates
+//         console.log("File sent"); // NEW
+//     } catch (err: any) {
+//         console.log(`Error: ${err?.message ?? err}`);
+//         res.statusCode = 500;
+//         res.end();
+//     }
+// };
+
+// a blocking operation in the handler.ts file
+// import { IncomingMessage, ServerResponse } from "http";
+// //import { readFile } from "fs/promises";
+// import { endPromise, writePromise } from "./promises";
+// const total = 2_000_000_000;
+// const iterations = 5;
+// let shared_counter = 0;
+// export const handler = async (req: IncomingMessage , res: ServerResponse) => {
+//     const request = shared_counter++;
+//     for (let iter = 0; iter < iterations; iter++) {
+//         for (let count = 0; count < total; count++) {
+//             count++;
+//         }
+//         const msg = `Request: ${request}, Iteration: ${(iter)}`;
+//         console.log(msg);
+//         await writePromise.bind(res)(msg + "\n");
+//     }
+//     await endPromise.bind(res)("Done");
+// };
+
+// in the above example the main thread is blocked until both loops have completed
+// "To see the effect of the blocked thread, open
+// two browser tabs and request http://localhost:5000 in both of them.
+// You need to start the request in the second tab before the first one has
+// finished, and you may need to adjust the total value to give yourself time.
+// The total value in Listing 4.20 takes three or four seconds to complete on
+// my system, which is long enough to start requests in both browser tabs."
+
+// "Some browsers, including Chrome, won’t make simultaneous
+// requests for the same URL. This means that the request fromthe second browser tab won’t be started until the response
+// from the first tab’s request has been received, which can make
+// it look like requests are always blocking."...
+// "You can avoid this problem by disabling the browser cache
+// (Chrome has a Disable Cache checkbox on the Network tab
+// in the F12 developer tools window, for example) or requesting
+// different URLs, such as http://localhost:5000?id=1
+// and http://localhost:5000?id=2 ."
+
+// Yielding control of the main thread
+// one way to address blocking is to break up work into smaller chunks
+// that are hopefully interleaved with other requests
+// the work is still done entirely with the main thread, but hte blocking
+// that occurs in a series of shorter periods, which means that access to the main thread
+// is more equitable.
+
 import { IncomingMessage, ServerResponse } from "http";
-import { readFile } from "fs/promises";
-import { endPromise } from "./promises"; // NEW
+import { endPromise, writePromise } from "./promises";
+const total = 2_000_000_000;
+const iterations = 5;
+let shared_counter = 0;
 export const handler = async (req: IncomingMessage, res: ServerResponse) => {
-    try {
-        const data: Buffer = await readFile("data.json");
-        await endPromise.bind(res)(data); // NEW, have to bind method when using the await keyword on the fcn that promisify creates
-        console.log("File sent"); // NEW
-    } catch (err: any) {
-        console.log(`Error: ${err?.message ?? err}`);
-        res.statusCode = 500;
-        res.end();
+    const request = shared_counter++;
+    const iterate = async (iter: number = 0) => {
+        for (let count = 0; count < total; count++) {
+            count++;
+        }
+        const msg = `Request: ${request}, Iteration: ${(iter)}`;
+        console.log(msg);
+        await writePromise.bind(res)(msg + "\n");
+        if (iter == iterations -1) {
+            await endPromise.bind(res)("Done");
+        }
+        else {
+            setImmediate(() => iterate(++iter));
+        }
     }
+    iterate();
 };
+// This will make multiple requests interleaved

@@ -5,18 +5,27 @@
 // ServerResponse object"
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
-const promises_1 = require("fs/promises");
-const promises_2 = require("./promises"); // NEW
+const promises_1 = require("./promises");
+const total = 2000000000;
+const iterations = 5;
+let shared_counter = 0;
 const handler = async (req, res) => {
-    try {
-        const data = await (0, promises_1.readFile)("data.json");
-        await promises_2.endPromise.bind(res)(data); // NEW, have to bind method when using the await keyword on the fcn that promisify creates
-        console.log("File sent"); // NEW
-    }
-    catch (err) {
-        console.log(`Error: ${err?.message ?? err}`);
-        res.statusCode = 500;
-        res.end();
-    }
+    const request = shared_counter++;
+    const iterate = async (iter = 0) => {
+        for (let count = 0; count < total; count++) {
+            count++;
+        }
+        const msg = `Request: ${request}, Iteration: ${(iter)}`;
+        console.log(msg);
+        await promises_1.writePromise.bind(res)(msg + "\n");
+        if (iter == iterations - 1) {
+            await promises_1.endPromise.bind(res)("Done");
+        }
+        else {
+            setImmediate(() => iterate(++iter));
+        }
+    };
+    iterate();
 };
 exports.handler = handler;
+// This will make multiple requests interleaved

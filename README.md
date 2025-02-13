@@ -164,3 +164,6 @@ Events are used to provide notifications that the state of the application has c
 
 Working with promises
 Promises are an alternative to callbacks and some parts of the Node.js API give us features to use both callbacks and promises. A promise serves the same purpose as a callback, which is to define the code that iwll be executed when the asynchronous operation is done. The main difference is that the code written with promises tend to be simpler than the callback counterpart.
+
+Executing Custom Code
+all js is executed by main thread, which means that any operation that does not use the non-blocking API from node.js WILL block the thread. 
