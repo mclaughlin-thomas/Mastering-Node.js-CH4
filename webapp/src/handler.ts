@@ -278,31 +278,53 @@
 // performed on a single thread
 
 
-import { IncomingMessage, ServerResponse } from "http";
-import { endPromise, writePromise } from "./promises";
-//import { Worker } from "worker_threads";
-import { Count } from "./counter_cb";const total = 2_000_000_000;
-const iterations = 5;
-let shared_counter = 0;
-export const handler = async (req: IncomingMessage, res: ServerResponse) => {
-    const request = shared_counter++;
-    Count(request, iterations, total, async (err,update) => {
-        if (err !== null) {
-            console.log(err)
-            res.statusCode = 500;
-            await res.end();
-        }
-        else if (update !== true) {
-            const msg = `Request: ${request}, Iteration: ${(update)}`;
-            console.log(msg);
-            await writePromise.bind(res)(msg + "\n");
-        }
-        else {
-            await endPromise.bind(res)("Done");
-        }
-    });
-};
+// import { IncomingMessage, ServerResponse } from "http";
+// import { endPromise, writePromise } from "./promises";
+// //import { Worker } from "worker_threads";
+// import { Count } from "./counter_cb";const total = 2_000_000_000;
+// const iterations = 5;
+// let shared_counter = 0;
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     const request = shared_counter++;
+//     Count(request, iterations, total, async (err,update) => {
+//         if (err !== null) {
+//             console.log(err)
+//             res.statusCode = 500;
+//             await res.end();
+//         }
+//         else if (update !== true) {
+//             const msg = `Request: ${request}, Iteration: ${(update)}`;
+//             console.log(msg);
+//             await writePromise.bind(res)(msg + "\n");
+//         }
+//         else {
+//             await endPromise.bind(res)("Done");
+//         }
+//     });
+// };
 
 // This example produces the same results as the previous example but is moreconsistent with the majority of the Node.js API, the key parts of which are
 // described in the chapters that follow.
 
+// Using a promise in the handler.ts file
+
+import { IncomingMessage, ServerResponse } from "http";
+import { endPromise, writePromise } from "./promises";
+//import { Count } from "./counter_cb";
+import { Count } from "./count_promise";
+const total = 2_000_000_000;
+const iterations = 5;
+let shared_counter = 0;
+export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+    const request = shared_counter++;
+    try {
+        await Count(request, iterations, total);
+        const msg = `Request: ${request}, Iterations: ${(iterations)}`;
+        await writePromise.bind(res)(msg + "\n");await endPromise.bind(res)("Done");
+    }
+    catch (err: any) {
+        console.log(err);
+        res.statusCode = 500;
+        res.end();
+    }
+};
