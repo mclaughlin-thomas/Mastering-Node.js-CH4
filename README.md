@@ -174,3 +174,5 @@ Node.js supports worker threads, which are additional threads for executing js, 
 Worker threads aer not the solution to every problem because there is overhead in creating and managing them; however, they do provide an effective way to execure js without blocking the main thread.
 
 The worker pool is the set of threads that node.js uses to implement the asynchronous features of its API. We do not directly interact with the worker pool.
+
+// Packaging worker threads into a callback
