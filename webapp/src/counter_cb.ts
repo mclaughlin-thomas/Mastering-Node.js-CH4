@@ -1,4 +1,7 @@
 import { Worker } from "worker_threads";
+
+// the count function accepts args that describe work to be done
+
 export const Count = (request: number, iterations: number, total: number, callback: (err: Error | null, update: number | boolean) => void) => {
     const worker = new Worker(__dirname + "/count_worker.js", {
         workerData: {

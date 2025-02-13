@@ -235,44 +235,70 @@
 
 // Using a worker thread in the handler.ts
 
-import { IncomingMessage, ServerResponse } from "http";
-import { endPromise, writePromise } from "./promises";
-import { Worker } from "worker_threads";
-const total = 2_000_000_000;
-const iterations = 5;let shared_counter = 0;
-export const handler = async (req: IncomingMessage, res: ServerResponse) => {
-    const request = shared_counter++;
-    //Worker threads are created by instantiating the Worker class
-    const worker = new Worker(__dirname + "/count_worker.js", {
-        workerData: {
-            iterations,
-            total,
-            request
-        }
-    });
-    //Worker threads communicate with the main thread by emitting events
-    // which are then handled by fuctions registered by the on method
-    worker.on("message", async (iter: number) => {
-        const msg = `Request: ${request}, Iteration: ${(iter)}`;
-        console.log(msg);
-        await writePromise.bind(res)(msg + "\n");
-    });
-    worker.on("exit", async (code: number) => {
-        if (code == 0) {
-            await endPromise.bind(res)("Done");
-        }
-        else {
-            res.statusCode = 500;
-            await res.end();
-        }
-    });
-    worker.on("error", async (err) => {
-        console.log(err);
-        res.statusCode = 500;
-        await res.end();
-    });
-};
+// import { IncomingMessage, ServerResponse } from "http";
+// import { endPromise, writePromise } from "./promises";
+// import { Worker } from "worker_threads";
+// const total = 2_000_000_000;
+// const iterations = 5;let shared_counter = 0;
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     const request = shared_counter++;
+//     //Worker threads are created by instantiating the Worker class
+//     const worker = new Worker(__dirname + "/count_worker.js", {
+//         workerData: {
+//             iterations,
+//             total,
+//             request
+//         }
+//     });
+//     //Worker threads communicate with the main thread by emitting events
+//     // which are then handled by fuctions registered by the on method
+//     worker.on("message", async (iter: number) => {
+//         const msg = `Request: ${request}, Iteration: ${(iter)}`;
+//         console.log(msg);
+//         await writePromise.bind(res)(msg + "\n");
+//     });
+//     worker.on("exit", async (code: number) => {
+//         if (code == 0) {
+//             await endPromise.bind(res)("Done");
+//         }
+//         else {
+//             res.statusCode = 500;
+//             await res.end();
+//         }
+//     });
+//     worker.on("error", async (err) => {
+//         console.log(err);
+//         res.statusCode = 500;
+//         await res.end();
+//     });
+// };
 
 //the important difference from the earlier examples is that work
 // for requests is being performed in parallel rather than all of the work being
 // performed on a single thread
+
+
+import { IncomingMessage, ServerResponse } from "http";
+import { endPromise, writePromise } from "./promises";
+//import { Worker } from "worker_threads";
+import { Count } from "./counter_cb";const total = 2_000_000_000;
+const iterations = 5;
+let shared_counter = 0;
+export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+    const request = shared_counter++;
+    Count(request, iterations, total, async (err,update) => {
+        if (err !== null) {
+            console.log(err)
+            res.statusCode = 500;
+            await res.end();
+        }
+        else if (update !== true) {
+            const msg = `Request: ${request}, Iteration: ${(update)}`;
+            console.log(msg);
+            await writePromise.bind(res)(msg + "\n");
+        }
+        else {
+            await endPromise.bind(res)("Done");
+        }
+    });
+};
