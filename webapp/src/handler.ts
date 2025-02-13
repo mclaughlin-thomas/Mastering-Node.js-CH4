@@ -40,18 +40,18 @@
 
 
 // Now using a promise in the handler.ts file
-import { IncomingMessage, ServerResponse } from "http";
-//import { readFile } from "fs";
-import { readFile } from "fs/promises";
-export const handler = (req: IncomingMessage, res: ServerResponse) => {
-    const p: Promise<Buffer> = readFile("data.json");
-    p.then((data: Buffer) => res.end(data, () => console.log("File sent")));
-    p.catch((err: Error) => {
-        console.log(`Error: ${err.message}`);
-        res.statusCode = 500;
-        res.end();
-    });
-};
+// import { IncomingMessage, ServerResponse } from "http";
+// //import { readFile } from "fs";
+// import { readFile } from "fs/promises";
+// export const handler = (req: IncomingMessage, res: ServerResponse) => {
+//     const p: Promise<Buffer> = readFile("data.json");
+//     p.then((data: Buffer) => res.end(data, () => console.log("File sent")));
+//     p.catch((err: Error) => {
+//         console.log(`Error: ${err.message}`);
+//         res.statusCode = 500;
+//         res.end();
+//     });
+// };
 
 // This is not how promises are usually used, but emphasizes the way promises work
 // This creates promise
@@ -74,3 +74,42 @@ export const handler = (req: IncomingMessage, res: ServerResponse) => {
 // perform. You can see an example of this in Chapter 6, where I
 // read configuration files synchronously before Node.js starts
 // listening for HTTP requests."
+
+// Promises are either resolved or rejected. Promise completes successfuly? -> its resolved.
+// The "then" method is used to registerr the function that will be invoked if the promise is resolved
+// meaning that the file has been read successfully like this:
+//p.then((data: Buffer) => res.end(data, () => console.log("File sent")));
+
+// A rejected promise is one where an error has occured. the catch method is used to register
+// a function that handles the error produced by a rejected promise:
+// p.catch((err: Error) => {
+//     console.log(`Error: ${err.message}`);
+//     res.statusCode = 500;
+//     res.end();
+// });
+
+
+// The then and catch methods can be chained together, which is one small
+// improvement in simplifying the code, as shown in Listing 4.13, and is a more
+// typical way to use promises.
+
+// import { IncomingMessage, ServerResponse } from "http";
+// import { readFile } from "fs/promises";
+// export const handler = (req: IncomingMessage, res: ServerResponse) => {
+//     readFile("data.json")
+//     .then((data: Buffer) => res.end(data, () => console.log("File sent")))
+//     .catch((err: Error) => {
+//         console.log(`Error: ${err.message}`);
+//         res.statusCode = 500;
+//         res.end();
+//     });
+// };
+
+// The above is a little nearer, but the real improvements come from async and await keywords
+//using async and await keywords in the handler.ts
+import { IncomingMessage, ServerResponse } from "http";
+import { readFile } from "fs/promises";export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+    const data: Buffer = await readFile("data.json");
+    res.end(data, () => console.log("File sent"));
+};
+
