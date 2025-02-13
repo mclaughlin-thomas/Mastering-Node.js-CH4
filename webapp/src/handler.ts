@@ -52,3 +52,25 @@ export const handler = (req: IncomingMessage, res: ServerResponse) => {
         res.end();
     });
 };
+
+// This is not how promises are usually used, but emphasizes the way promises work
+// This creates promise
+// const p: Promise<Buffer> = readFile("data.json");
+// the result returned from the readFile function is Promise<Buffer>, which
+// is a promse that will produce a Buffer object when its asynchronous operation is done
+
+// "In most cases, you should use the non-blocking features that
+// Node.js provides to maximize the number of requests that
+// Node.js can handle, but there are two situations when blockingoperations make more sense. The first situation arises when
+// you know for certain that the operations will be completed so
+// quickly that it is quicker than setting up a promise or a
+// callback. There is a resource and time cost associated with
+// performing an asynchronous operation and this can sometimes
+// be avoided. This situation doesn’t arise often, and you should
+// carefully consider the potential performance impact.
+// The second situation is more common, and that’s when you
+// know that the next block of code that the main thread will
+// execute will be the result of the operation you are about to
+// perform. You can see an example of this in Chapter 6, where I
+// read configuration files synchronously before Node.js starts
+// listening for HTTP requests."
