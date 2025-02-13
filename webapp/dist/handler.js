@@ -6,40 +6,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const promises_1 = require("./promises");
-const worker_threads_1 = require("worker_threads");
+//import { Count } from "./counter_cb";
+const count_promise_1 = require("./count_promise");
 const total = 2000000000;
 const iterations = 5;
 let shared_counter = 0;
 const handler = async (req, res) => {
     const request = shared_counter++;
-    //Worker threads are created by instantiating the Worker class
-    const worker = new worker_threads_1.Worker(__dirname + "/count_worker.js", {
-        workerData: {
-            iterations,
-            total,
-            request
-        }
-    });
-    //Worker threads communicate with the main thread by emitting events
-    // which are then handled by fuctions registered by the on method
-    worker.on("message", async (iter) => {
-        const msg = `Request: ${request}, Iteration: ${(iter)}`;
-        console.log(msg);
+    try {
+        await (0, count_promise_1.Count)(request, iterations, total);
+        const msg = `Request: ${request}, Iterations: ${(iterations)}`;
         await promises_1.writePromise.bind(res)(msg + "\n");
-    });
-    worker.on("exit", async (code) => {
-        if (code == 0) {
-            await promises_1.endPromise.bind(res)("Done");
-        }
-        else {
-            res.statusCode = 500;
-            await res.end();
-        }
-    });
-    worker.on("error", async (err) => {
+        await promises_1.endPromise.bind(res)("Done");
+    }
+    catch (err) {
         console.log(err);
         res.statusCode = 500;
-        await res.end();
-    });
+        res.end();
+    }
 };
 exports.handler = handler;
