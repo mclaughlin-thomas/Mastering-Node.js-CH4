@@ -180,3 +180,7 @@ The worker pool is the set of threads that node.js uses to implement the asynchr
 
 // Packaging worker threads into a promise
 Worker threads can also be wrapped up in a promise, although promises are not suited to receive interim updates in the way callbacks are. Therefore, a promise will only produce a result when all of the work has been completed or there has been a problem.
+
+
+//SUMMARY
+"In this chapter, I described the way that JavaScript code is executed andexplained the effect this has on HTTP request processing and why this approach is different from other platforms. I explained that JavaScript code is executed on a single main thread and demonstrated the features that Node.jsprovides for offloading work on other threads. JavaScript code is executed on a single thread, known as the main thread. The Node.js API uses native threads to perform many operations to avoid blocking the main thread The Node.js API largely uses callbacks, but there is also some support for promises Node.js provides functions for converting callbacks and promises Node.js supports worker threads for executing JavaScript code without blocking the main thread"
