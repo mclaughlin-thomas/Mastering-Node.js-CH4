@@ -162,3 +162,5 @@ Node.js replaces the API provided by the browser with one that supports common s
 Handling Events
 Events are used to provide notifications that the state of the application has changed and provide an opportuninity to execute a callback function to handle that change. Events are handled through the node.js api, though these are often conveinence features that hide away the details. Server.ts
 
+Working with promises
+Promises are an alternative to callbacks and some parts of the Node.js API give us features to use both callbacks and promises. A promise serves the same purpose as a callback, which is to define the code that iwll be executed when the asynchronous operation is done. The main difference is that the code written with promises tend to be simpler than the callback counterpart.

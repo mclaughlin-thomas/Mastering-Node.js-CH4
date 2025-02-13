@@ -19,21 +19,36 @@
 //Breaking up the process of producing an http response with callbacks
 // means that the js main thread does not have to wait for the file system to read the contents of the file,
 // this allows requests from other clients to be procesed.
-import { IncomingMessage, ServerResponse } from "http";
-import { readFile } from "fs";
+// import { IncomingMessage, ServerResponse } from "http";
+// import { readFile } from "fs";
 
-export const handler = (req: IncomingMessage, res:ServerResponse) => {
-    readFile("data.json", (err: Error | null, data: Buffer) => {
-        // reads the contents of a file.
-        if (err == null) {
-            res.end(data, () => console.log("Filesent")); // comes up when user sends request. 3rd callback
-        }
-        //The read operation is asynchronous and is implemented using a native thread.
-        //The contents of the file are passed to a callback function, which sends them to the http client.
-        else {
-            console.log(`Error: ${err.message}`);
-            res.statusCode = 500;
-            res.end();
-        }
+// export const handler = (req: IncomingMessage, res:ServerResponse) => {
+//     readFile("data.json", (err: Error | null, data: Buffer) => {
+//         // reads the contents of a file.
+//         if (err == null) {
+//             res.end(data, () => console.log("Filesent")); // comes up when user sends request. 3rd callback
+//         }
+//         //The read operation is asynchronous and is implemented using a native thread.
+//         //The contents of the file are passed to a callback function, which sends them to the http client.
+//         else {
+//             console.log(`Error: ${err.message}`);
+//             res.statusCode = 500;
+//             res.end();
+//         }
+//     });
+// };
+
+
+// Now using a promise in the handler.ts file
+import { IncomingMessage, ServerResponse } from "http";
+//import { readFile } from "fs";
+import { readFile } from "fs/promises";
+export const handler = (req: IncomingMessage, res: ServerResponse) => {
+    const p: Promise<Buffer> = readFile("data.json");
+    p.then((data: Buffer) => res.end(data, () => console.log("File sent")));
+    p.catch((err: Error) => {
+        console.log(`Error: ${err.message}`);
+        res.statusCode = 500;
+        res.end();
     });
 };
