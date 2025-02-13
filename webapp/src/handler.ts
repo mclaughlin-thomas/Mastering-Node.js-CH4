@@ -208,27 +208,67 @@
 // that occurs in a series of shorter periods, which means that access to the main thread
 // is more equitable.
 
+// import { IncomingMessage, ServerResponse } from "http";
+// import { endPromise, writePromise } from "./promises";
+// const total = 2_000_000_000;
+// const iterations = 5;
+// let shared_counter = 0;
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     const request = shared_counter++;
+//     const iterate = async (iter: number = 0) => {
+//         for (let count = 0; count < total; count++) {
+//             count++;
+//         }
+//         const msg = `Request: ${request}, Iteration: ${(iter)}`;
+//         console.log(msg);
+//         await writePromise.bind(res)(msg + "\n");
+//         if (iter == iterations -1) {
+//             await endPromise.bind(res)("Done");
+//         }
+//         else {
+//             setImmediate(() => iterate(++iter));
+//         }
+//     }
+//     iterate();
+// };
+// This will make multiple requests interleaved
+
+// Using a worker thread in the handler.ts
+
 import { IncomingMessage, ServerResponse } from "http";
 import { endPromise, writePromise } from "./promises";
+import { Worker } from "worker_threads";
 const total = 2_000_000_000;
-const iterations = 5;
-let shared_counter = 0;
+const iterations = 5;let shared_counter = 0;
 export const handler = async (req: IncomingMessage, res: ServerResponse) => {
     const request = shared_counter++;
-    const iterate = async (iter: number = 0) => {
-        for (let count = 0; count < total; count++) {
-            count++;
+    //Worker threads are created by instantiating the Worker class
+    const worker = new Worker(__dirname + "/count_worker.js", {
+        workerData: {
+            iterations,
+            total,
+            request
         }
+    });
+    //Worker threads communicate with the main thread by emitting events
+    // which are then handled by fuctions registered by the on method
+    worker.on("message", async (iter: number) => {
         const msg = `Request: ${request}, Iteration: ${(iter)}`;
         console.log(msg);
         await writePromise.bind(res)(msg + "\n");
-        if (iter == iterations -1) {
+    });
+    worker.on("exit", async (code: number) => {
+        if (code == 0) {
             await endPromise.bind(res)("Done");
         }
         else {
-            setImmediate(() => iterate(++iter));
+            res.statusCode = 500;
+            await res.end();
         }
-    }
-    iterate();
+    });
+    worker.on("error", async (err) => {
+        console.log(err);
+        res.statusCode = 500;
+        await res.end();
+    });
 };
-// This will make multiple requests interleaved
