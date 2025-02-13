@@ -176,3 +176,7 @@ Worker threads aer not the solution to every problem because there is overhead i
 The worker pool is the set of threads that node.js uses to implement the asynchronous features of its API. We do not directly interact with the worker pool.
 
 // Packaging worker threads into a callback
+
+
+// Packaging worker threads into a promise
+Worker threads can also be wrapped up in a promise, although promises are not suited to receive interim updates in the way callbacks are. Therefore, a promise will only produce a result when all of the work has been completed or there has been a problem.

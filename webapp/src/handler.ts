@@ -302,3 +302,7 @@ export const handler = async (req: IncomingMessage, res: ServerResponse) => {
         }
     });
 };
+
+// This example produces the same results as the previous example but is moreconsistent with the majority of the Node.js API, the key parts of which are
+// described in the chapters that follow.
+
