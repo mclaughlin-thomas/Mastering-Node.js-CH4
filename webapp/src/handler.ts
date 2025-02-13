@@ -126,9 +126,23 @@ export const handler = async (req: IncomingMessage, res: ServerResponse) => {
     try {
         const data: Buffer = await readFile("data.json");
         res.end(data, () => console.log("File sent"));
-    } catch (err: any) {
+    } catch (err: any) { // any because js does not restrict the types that can be used to represent errors
         console.log(`Error: ${err?.message ?? err}`);
         res.statusCode = 500;
         res.end();
     }
 };
+
+// "One advantage of callbacks over promises is that callbacks
+// can be invoked more than once for the same operation,
+// allowing a series of updates to be provided while
+// asynchronous work is being performed. Promises are
+// intended to produce a single result without any interim
+// updates. You can see an example of this difference at the end
+// of the chapter."
+
+// "Not every part of the Node.js API supports both promises and callbacks, and
+// that can lead to both approaches being mixed in the same code. You can see
+// this problem in the example, where the readFile function returns a
+// promise, but the end method, which sends data to the client and finishes the
+// HTTP response, uses a callback"
