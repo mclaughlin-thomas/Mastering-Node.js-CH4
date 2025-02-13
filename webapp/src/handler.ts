@@ -112,4 +112,9 @@ import { readFile } from "fs/promises";export const handler = async (req: Incomi
     const data: Buffer = await readFile("data.json");
     res.end(data, () => console.log("File sent"));
 };
+// the async await keywords flatten the code by removing the need for the then method and its function.
+// The async keyword is applied to the function to handle requests
+// export const handler = async (req: IncomingMessage, res: ServerResponse) => {
 
+// The await keyword is applied to statements that return promises, like this:
+// const data: Buffer = await readFile("data.json");
