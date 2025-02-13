@@ -107,14 +107,28 @@
 
 // The above is a little nearer, but the real improvements come from async and await keywords
 //using async and await keywords in the handler.ts
-import { IncomingMessage, ServerResponse } from "http";
-import { readFile } from "fs/promises";export const handler = async (req: IncomingMessage, res: ServerResponse) => {
-    const data: Buffer = await readFile("data.json");
-    res.end(data, () => console.log("File sent"));
-};
+// import { IncomingMessage, ServerResponse } from "http";
+// import { readFile } from "fs/promises";export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+//     const data: Buffer = await readFile("data.json");
+//     res.end(data, () => console.log("File sent"));
+// };
 // the async await keywords flatten the code by removing the need for the then method and its function.
 // The async keyword is applied to the function to handle requests
 // export const handler = async (req: IncomingMessage, res: ServerResponse) => {
 
 // The await keyword is applied to statements that return promises, like this:
 // const data: Buffer = await readFile("data.json");
+
+// adding error handling
+import { IncomingMessage, ServerResponse } from "http";
+import { readFile } from "fs/promises";
+export const handler = async (req: IncomingMessage, res: ServerResponse) => {
+    try {
+        const data: Buffer = await readFile("data.json");
+        res.end(data, () => console.log("File sent"));
+    } catch (err: any) {
+        console.log(`Error: ${err?.message ?? err}`);
+        res.statusCode = 500;
+        res.end();
+    }
+};
